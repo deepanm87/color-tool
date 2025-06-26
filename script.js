@@ -4,12 +4,29 @@ const alteredColor = document.getElementById('altered-color')
 const alteredColorText = document.getElementById('altered-color-text')
 const sliderText = document.getElementById('slider-text')
 const slider = document.getElementById('slider')
+const lightenText = document.getElementById('lighten-text')
+const darkenText = document.getElementById('darken-text')
+const toggleBtn = document.getElementById('toggle-btn')
+
+toggleBtn.addEventListener('click', () => {
+    if(toggleBtn.classList.contains('toggled')) {
+        toggleBtn.classList.remove('toggled')
+        lightenText.classList.remove('unselected')
+        darkenText.classList.add('unselected')
+    } else {    
+        toggleBtn.classList.add('toggled')
+        lightenText.classList.add('unselected')
+        darkenText.classList.remove('unselected')
+    }
+    reset()
+})
 
 hexInput.addEventListener('keyup', () => {
     const hex = hexInput.value
     if(!isValidHex(hex)) return
     const strippedHex = hex.replace('#', '')
     inputColor.style.backgroundColor = `#${strippedHex}`
+    reset()
 })
 
 const isValidHex = hex => {
@@ -56,10 +73,7 @@ const alterColor = (hex, percentage) => {
 }
 
 const increaseFrom0To255 = (hex, amount) => {
-    const newHex = hex + amount
-    if(newHex > 255) return 255
-    if(newHex < 0) return 0
-    return newHex
+    return Math.min(255, Math.max(0, hex + amount))
 }
 
 alterColor('fff', 10)
@@ -68,7 +82,17 @@ slider.addEventListener('input', () => {
 
     if(!isValidHex(hexInput.value)) return
     sliderText.textContent = `${slider.value}%`
+
+    const valueAddition = toggleBtn.classList.contains('toggled') ? -slider.value : slider.value
+
     const alteredHex = alterColor(hexInput.value, slider.value)
     alteredColor.style.background = alteredColor
     alteredColorText.innerText = `Altered Color ${alteredHex}`
 })
+
+const reset = () => {
+    slider.value = 0
+    sliderText.innerText = `0%`
+    alteredColor.style.backgroundColor = hexInput.value
+    alteredColorText.innerText = `Altered Color ${hexInput.value}`
+}
